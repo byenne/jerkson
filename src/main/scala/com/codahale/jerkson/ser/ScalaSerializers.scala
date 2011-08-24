@@ -4,7 +4,7 @@ import org.codehaus.jackson.`type`.JavaType
 import com.codahale.jerkson.AST.JValue
 import org.codehaus.jackson.map._
 
-class ScalaSerializers extends Serializers.None {
+class ScalaSerializers(classLoader: ClassLoader) extends Serializers.None {
   override def findSerializer(config: SerializationConfig, javaType: JavaType, beanDesc: BeanDescription, beanProp: BeanProperty) = {
     val ser: Object = if (classOf[Option[_]].isAssignableFrom(beanDesc.getBeanClass)) {
         new OptionSerializer
@@ -23,7 +23,7 @@ class ScalaSerializers extends Serializers.None {
     } else if (classOf[Either[_,_]].isAssignableFrom(beanDesc.getBeanClass)) {
       new EitherSerializer
     } else if (classOf[Product].isAssignableFrom(beanDesc.getBeanClass)) {
-      new CaseClassSerializer(beanDesc.getBeanClass)
+      new CaseClassSerializer(config, beanDesc.getBeanClass, classLoader)
     } else {
       null
     }

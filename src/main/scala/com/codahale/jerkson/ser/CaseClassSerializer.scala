@@ -1,17 +1,22 @@
 package com.codahale.jerkson.ser
 
 import org.codehaus.jackson.JsonGenerator
-import org.codehaus.jackson.map.{SerializerProvider, JsonSerializer}
 import org.codehaus.jackson.annotate.JsonIgnore
 import org.codehaus.jackson.map.annotate.JsonCachable
 import java.lang.reflect.Modifier
+import com.codahale.jerkson.util.CaseClassSigParser
+import org.codehaus.jackson.map.{SerializationConfig, SerializerProvider, JsonSerializer}
 
 @JsonCachable
-class CaseClassSerializer[A <: Product](klass: Class[_]) extends JsonSerializer[A] {
+class CaseClassSerializer[A <: Product](config: SerializationConfig,
+                                        klass: Class[_],
+                                        classLoader: ClassLoader) extends JsonSerializer[A] {
+  private val params = CaseClassSigParser.parse(klass, config.getTypeFactory, classLoader).map(_._1).toArray
   private val nonIgnoredFields = klass.getDeclaredFields.filterNot { f =>
     f.getAnnotation(classOf[JsonIgnore]) != null ||
       (f.getModifiers & Modifier.TRANSIENT) != 0 ||
-      f.getName.contains("$")
+      f.getName.contains("$") ||
+      !params.contains(f.getName)
   }
 
   private val methods = klass.getDeclaredMethods

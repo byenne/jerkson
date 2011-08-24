@@ -28,8 +28,8 @@ class CaseClassSupportSpec extends Spec {
   }
 
   class `A case class with lazy fields` {
-    @test def `generates a JSON object with those fields evaluated` = {
-      generate(CaseClassWithLazyVal(1)).must(be("""{"id":1,"woo":"yeah"}"""))
+    @test def `generates a JSON object with those fields ignored` = {
+      generate(CaseClassWithLazyVal(1)).must(be("""{"id":1}"""))
     }
 
     @test def `is parsable from a JSON object without those fields` = {

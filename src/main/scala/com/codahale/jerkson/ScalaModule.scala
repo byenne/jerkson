@@ -12,6 +12,6 @@ class ScalaModule(classLoader: ClassLoader) extends Module {
 
   def setupModule(context: SetupContext) {
     context.addDeserializers(new ScalaDeserializers(classLoader))
-    context.addSerializers(new ScalaSerializers)
+    context.addSerializers(new ScalaSerializers(classLoader))
   }
 }
